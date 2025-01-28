@@ -14,7 +14,7 @@ jobs:
     steps:
       # Setup
       - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-nuget@v1.0.1
+      - uses: AtomiCloud/actions.cache-nuget@v1.1.0
 
       # pre commit
       - name: Run pre-commit
@@ -30,7 +30,7 @@ jobs:
     steps:
       # Setup
       - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-nuget@v1.0.1
+      - uses: AtomiCloud/actions.cache-nuget@v1.1.0
 
       # sonarqube
       - name: Build and analyze
@@ -53,7 +53,7 @@ jobs:
     steps:
       # Setup
       - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-nuget@v1.0.1
+      - uses: AtomiCloud/actions.cache-nuget@v1.1.0
 
       # pre commit
       - name: Run Test
@@ -69,7 +69,7 @@ jobs:
     steps:
       # Setup
       - uses: AtomiCloud/actions.setup-nix@v1.2.1
-      - uses: AtomiCloud/actions.cache-nuget@v1.0.1
+      - uses: AtomiCloud/actions.cache-nuget@v1.1.0
 
         # Publish
       - uses: rlespinasse/github-slug-action@v5.x
@@ -103,7 +103,7 @@ jobs:
       # Setup
       - uses: AtomiCloud/actions.setup-nix@v1.2.1
       - uses: AtomiCloud/actions.cache-npm@v1.0.1
-      - uses: AtomiCloud/actions.cache-nuget@v1.0.1
+      - uses: AtomiCloud/actions.cache-nuget@v1.1.0
 
       # action
       - uses: rlespinasse/github-slug-action@v5.x
