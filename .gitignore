@@ -1,0 +1,10 @@
+obj
+bin
+Chsarpier
+.DS_Store
+.env
+.idea
+.direnv
+.pre-commit-config.yaml
+dotCover.Output/
+dotCover.Output.*
