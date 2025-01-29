@@ -2,14 +2,7 @@
 with packages;
 {
   system = [
-    coreutils
-    findutils
-    gnugrep
-    gnused
-    bash
-    jq
-    yq
-    curl
+    atomiutils
     xmlstarlet
   ];
 

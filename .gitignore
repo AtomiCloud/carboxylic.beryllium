@@ -8,3 +8,4 @@ Chsarpier
 .pre-commit-config.yaml
 dotCover.Output/
 dotCover.Output.*
+*.*.DotSettings.user
