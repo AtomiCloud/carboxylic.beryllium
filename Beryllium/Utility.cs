@@ -29,7 +29,6 @@ public static class Utility
 
     public static T ToObj<T>(this string json)
     {
-        var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-        return JsonSerializer.Deserialize<T>(json, options)!;
+        return JsonSerializer.Deserialize<T>(json)!;
     }
 }
