@@ -1,3 +1,5 @@
+## [1.3.0](https://github.com/AtomiCloud/carboxylic.beryllium/compare/v1.2.0...v1.3.0) (2025-02-01)
+
 ## [1.2.0](https://github.com/AtomiCloud/carboxylic.beryllium/compare/v1.1.0...v1.2.0) (2025-01-30)
 
 ## [1.1.0](https://github.com/AtomiCloud/carboxylic.beryllium/compare/v1.0.0...v1.1.0) (2025-01-29)
