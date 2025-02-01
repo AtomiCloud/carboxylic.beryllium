@@ -21,6 +21,6 @@ project="AtomiCloud_${ATOMI_PLATFORM}.${ATOMI_SERVICE}"
 echo "📡 Starting SonarQube..."
 dotnet sonarscanner begin /k:"${project}" /o:"${SONAR_ORG}" /d:sonar.token="${SONAR_TOKEN}" /d:sonar.host.url="${SONAR_HOST}" /d:sonar.cs.dotcover.reportsPaths=dotCover.Output.html
 dotnet build --no-incremental
-dotnet dotcover test --dcReportType=HTML --dcFilters=-:testhost
+dotnet dotcover test --dcReportType=HTML
 dotnet sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 echo "✅ Done!"

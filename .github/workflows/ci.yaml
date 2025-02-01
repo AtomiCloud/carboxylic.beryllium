@@ -5,6 +5,7 @@ on:
 
 env:
   COVERAGE_THRESHOLD: 80
+  ATOMI_SERVICE: Beryllium
 
 jobs:
   precommit:
@@ -58,8 +59,10 @@ jobs:
       - uses: AtomiCloud/actions.setup-nix@v1
       - uses: AtomiCloud/actions.cache-nuget@v1
 
-      # pre commit
+      # Test
       - name: Run Test
+        env:
+          ATOMI_SERVICE: ${{ env.ATOMI_SERVICE }}
         run: nix develop .#ci -c ./scripts/ci/test.sh ${{ env.COVERAGE_THRESHOLD }}
 
   publish:
@@ -92,6 +95,7 @@ jobs:
       - precommit
       - publish
       - test
+      - sonarqube
 
     if: github.ref == 'refs/heads/main'
     runs-on:

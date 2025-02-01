@@ -2,6 +2,7 @@ version: '3'
 
 env:
   COVERAGE_THRESHOLD: 80
+  ATOMI_SERVICE: Beryllium
 
 tasks:
   setup:

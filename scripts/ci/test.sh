@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+[ "${ATOMI_SERVICE}" = '' ] && echo "❌ 'ATOMI_SERVICE' env var not set" && exit 1
+
 threshold=${1:-50}
 
 set -eou pipefail
@@ -19,11 +21,11 @@ echo "✅ Done!"
 
 # run tests
 echo "🧪 Running and Coverage..."
-dotnet dotcover test --dcReportType=Json --dcFilters=-:testhost
+dotnet dotcover test --dcReportType=Json
 echo "✅ Done!"
 
 # print coverage
-coverage=$(jq -r '.CoveragePercent' ./dotCover.Output.json)
+coverage=$(jq --arg name "${ATOMI_SERVICE}" '.Children[] | select(.Name == $name and .Kind == "Assembly") | .CoveragePercent' ./dotCover.Output.json)
 
 echo "🧪 Current test coverage: ${coverage}%"
 
