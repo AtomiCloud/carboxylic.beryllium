@@ -745,4 +745,73 @@ public class UtilityTests
         // Assert
         actual.Should().BeEquivalentTo(expected);
     }
+
+    // ====================
+    // G Method (ToGuid)
+    // ====================
+
+    private class G_Should_ParseValidGuidStrings_Data : TheoryData<string, Guid>
+    {
+        public G_Should_ParseValidGuidStrings_Data()
+        {
+            Add(
+                "d2719a91-ea3e-4ec6-aec7-52f0c41cf09a",
+                Guid.Parse("d2719a91-ea3e-4ec6-aec7-52f0c41cf09a")
+            );
+            Add(
+                "3f4b3cd4-645f-48b0-b897-c96de3c021b2",
+                Guid.Parse("3f4b3cd4-645f-48b0-b897-c96de3c021b2")
+            );
+            Add(
+                "04e233b5-9c17-4514-89c2-c2b0c3e99829",
+                Guid.Parse("04e233b5-9c17-4514-89c2-c2b0c3e99829")
+            );
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(G_Should_ParseValidGuidStrings_Data))]
+    public void G_Should_ParseValidGuidStrings(string input, Guid expected)
+    {
+        // Act
+        var actual = input.G();
+
+        // Assert
+        actual
+            .Should()
+            .Be(expected, "G should correctly parse valid GUID strings into Guid objects");
+    }
+
+    // ==========================
+    // Invalid or Empty Strings
+    // ==========================
+
+    [Fact]
+    public void G_Should_ThrowFormatException_ForInvalidGuidStrings()
+    {
+        // Arrange
+        var input = "Invalid-Guid-String";
+
+        // Act
+        Action act = () => input.G();
+
+        // Assert
+        act.Should().Throw<FormatException>("Invalid GUID strings should cause a FormatException");
+    }
+
+    [Fact]
+    public void G_Should_ThrowFormatException_ForEmptyString()
+    {
+        // Arrange
+        var input = "";
+
+        // Act
+        Action act = () => input.G();
+
+        // Assert
+        act.Should()
+            .Throw<FormatException>(
+                "Empty strings are not valid GUIDs and should throw a FormatException"
+            );
+    }
 }

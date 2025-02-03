@@ -118,4 +118,14 @@ public static class Utility
     {
         return new StringContent(req.ToJson(), Encoding.UTF8, "application/json");
     }
+
+    /// <summary>
+    /// Convert string to Guid
+    /// </summary>
+    /// <param name="s">string to be converted</param>
+    /// <returns>string in GUID</returns>
+    public static Guid G(this string s)
+    {
+        return Guid.Parse(s);
+    }
 }
