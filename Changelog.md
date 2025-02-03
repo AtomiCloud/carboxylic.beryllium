@@ -1,3 +1,18 @@
+## [1.5.0](https://github.com/AtomiCloud/carboxylic.beryllium/compare/v1.4.0...v1.5.0) (2025-02-03)
+
+
+### ✨ Features ✨
+
+* **Utility:** add Base64 encoding and decoding methods ([5df2b8a](https://github.com/AtomiCloud/carboxylic.beryllium/commit/5df2b8a07ba24b4a9c2a1d7fa62219db82715fc0))
+* **DictionaryUtility:** add dictionary utility methods and unit tests ([d1b4f87](https://github.com/AtomiCloud/carboxylic.beryllium/commit/d1b4f87c851ee29129d6ce3ebaa8336a4f8af0d7))
+* **Utility:** add guid conversion function ([9f9b3ea](https://github.com/AtomiCloud/carboxylic.beryllium/commit/9f9b3ea0c8177d1fd86fe1ea012b3b35f34e34b5))
+* **Utility:** add methods for HTTP message conversion ([755bc32](https://github.com/AtomiCloud/carboxylic.beryllium/commit/755bc32d4ab36be2de1e4d10a2bba70318423779))
+
+
+### 🐛 Bug Fixes 🐛
+
+* **dep:** update dependency descriptions ([02ae6f2](https://github.com/AtomiCloud/carboxylic.beryllium/commit/02ae6f20eb2d5f337a3d2354e30ca97d18745c0d))
+
 ## [1.4.0](https://github.com/AtomiCloud/carboxylic.beryllium/compare/v1.3.0...v1.4.0) (2025-02-02)
 
 

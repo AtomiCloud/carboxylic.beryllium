@@ -175,12 +175,12 @@ Chores like test, attempts, typos, etc
 
 Dependency updates from upstream
 
-| Scope   | Description        | Bump    |
-| ------- | ------------------ | ------- |
-| default | Dependency updates | `nil`   |
-| `patch` | Dependency updates | `patch` |
-| `minor` | Dependency updates | `minor` |
-| `major` | Dependency updates | `major` |
+| Scope   | Description                    | Bump    |
+| ------- | ------------------------------ | ------- |
+| default | Dependency updates             | `nil`   |
+| `patch` | Dependency updates are patches | `patch` |
+| `minor` | Dependency updates are minor   | `minor` |
+| `major` | Dependency updates are major   | `major` |
 
 # Special Scopes
 
