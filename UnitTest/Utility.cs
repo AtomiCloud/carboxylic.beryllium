@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using CarboxylicBeryllium;
 using FluentAssertions;
 
@@ -113,7 +114,7 @@ public class UtilityTests
             Add("23:59:59", new TimeOnly(23, 59, 59)); // End of day
             Add("00:00:00", new TimeOnly(0, 0, 0)); // Start of day
             Add("01:02:03", new TimeOnly(1, 2, 3)); // произвольное время
-            Add("12:34:56", new TimeOnly(12, 34, 56)); // Mid-day time
+            Add("12:34:56", new TimeOnly(12, 34, 56)); // Midday time
             Add("18:00:00", new TimeOnly(18, 0, 0)); // Evening time
         }
     }
@@ -532,5 +533,285 @@ public class UtilityTests
 
         // Assert
         act.Should().Throw<JsonException>();
+    }
+
+    // ============================================
+    //  Base64Encode method tests
+    // ============================================
+
+    // Data for Base64Encode method happy path
+    private class Base64Encode_Should_ReturnBase64String_Data
+        : TheoryData<string, Encoding?, string>
+    {
+        public Base64Encode_Should_ReturnBase64String_Data()
+        {
+            // Default encoding (UTF8)
+            Add("Hello, World!", null, "SGVsbG8sIFdvcmxkIQ=="); // Basic test
+            Add("12345", null, "MTIzNDU="); // Numeric string
+            Add("", null, ""); // Empty string
+            Add(" ", null, "IA=="); // Single space
+
+            // Custom encoding
+            Add("Hello, World!", Encoding.ASCII, "SGVsbG8sIFdvcmxkIQ=="); // ASCII
+            Add("世界", Encoding.UTF8, "5LiW55WM"); // UTF8 with non-ASCII chars
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(Base64Encode_Should_ReturnBase64String_Data))]
+    public void Base64Encode_Should_ReturnBase64String(
+        string input,
+        Encoding? encoding,
+        string expected
+    )
+    {
+        // Act
+        var result = input.Base64Encode(encoding);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Base64Encode_Should_ThrowArgumentNullException_For_NullInput()
+    {
+        // Arrange
+        string input = null!;
+
+        // Act
+        Action act = () => input.Base64Encode(Encoding.UTF8);
+
+        // Assert
+        act.Should()
+            .Throw<ArgumentNullException>()
+            .WithMessage("Value cannot be null. (Parameter 's')");
+    }
+
+    // ============================================
+    //    Base64Decode method tests
+    // ============================================
+
+    // Data for Base64Decode method happy path
+    private class Base64Decode_Should_ReturnPlainString_Data : TheoryData<string, Encoding?, string>
+    {
+        public Base64Decode_Should_ReturnPlainString_Data()
+        {
+            // Default encoding (UTF8)
+            Add("SGVsbG8sIFdvcmxkIQ==", null, "Hello, World!"); // Basic test
+            Add("MTIzNDU=", null, "12345"); // Numeric string
+            Add("", null, ""); // Empty string
+            Add("IA==", null, " "); // Single space
+
+            // Custom encoding
+            Add("SGVsbG8sIFdvcmxkIQ==", Encoding.ASCII, "Hello, World!"); // ASCII
+            Add("5Li76ZmG", Encoding.UTF8, "主陆"); // UTF8 with non-ASCII chars
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(Base64Decode_Should_ReturnPlainString_Data))]
+    public void Base64Decode_Should_ReturnPlainString(
+        string input,
+        Encoding? encoding,
+        string expected
+    )
+    {
+        // Act
+        var result = input.Base64Decode(encoding);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Base64Decode_Should_ThrowFormatException_For_InvalidBase64String()
+    {
+        // Arrange
+        var invalidBase64 = "Invalid Base64 Data";
+
+        // Act
+        Action act = () => invalidBase64.Base64Decode(Encoding.UTF8);
+
+        // Assert
+        act.Should().Throw<FormatException>();
+    }
+
+    private class MockRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Age { get; set; }
+    }
+
+    // ============================================
+    // 1) ToStringRequest method tests
+    // ============================================
+
+    // Data for ToStringRequest method happy path
+    private class ToStringRequest_Should_ReturnStringContent_Data
+        : TheoryData<object, StringContent>
+    {
+        public ToStringRequest_Should_ReturnStringContent_Data()
+        {
+            Add(
+                new MockRequest { Name = "John", Age = 30 },
+                new StringContent("""{"Name":"John","Age":30}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                new MockRequest { Name = string.Empty, Age = 0 },
+                new StringContent("""{"Name":"","Age":0}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                new { SomeProp = 123 },
+                new StringContent("""{"SomeProp":123}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                "Hello, World!",
+                new StringContent(
+                    """
+                    "Hello, World!"
+                    """,
+                    Encoding.UTF8,
+                    "application/json"
+                )
+            );
+            Add(12345, new StringContent("12345", Encoding.UTF8, "application/json"));
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ToStringRequest_Should_ReturnStringContent_Data))]
+    public void ToStringRequest_Should_ReturnStringContent(object input, StringContent expected)
+    {
+        // Act
+        var actual = input.ToStringRequest();
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    // ============================================
+    // 2) ToMessage method tests
+    // ============================================
+
+    // Data for ToMessage method happy path
+    private class ToMessage_Should_ReturnHttpRequestMessage_Data
+        : TheoryData<object, HttpMethod, string, HttpRequestMessage>
+    {
+        public ToMessage_Should_ReturnHttpRequestMessage_Data()
+        {
+            // Add(new MockRequest { Name = "Alice", Age = 25 }, HttpMethod.Post, "https://example.com/",
+            //     new HttpRequestMessage(HttpMethod.Post,"https://example.com/")
+            //     {
+            //         Content = new StringContent("""{"Name":"Alice","Age":25}""", Encoding.UTF8, "application/json")
+            //     });
+            Add(
+                new MockRequest { Name = "Bob", Age = 22 },
+                HttpMethod.Put,
+                "/api/users",
+                new HttpRequestMessage(HttpMethod.Put, "/api/users")
+                {
+                    Content = new StringContent(
+                        """{"Name":"Bob","Age":22}""",
+                        Encoding.UTF8,
+                        "application/json"
+                    ),
+                }
+            );
+
+            Add(
+                12345,
+                HttpMethod.Delete,
+                "https://example.com/delete",
+                new HttpRequestMessage(HttpMethod.Delete, "https://example.com/delete")
+                {
+                    Content = new StringContent("12345", Encoding.UTF8, "application/json"),
+                }
+            );
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ToMessage_Should_ReturnHttpRequestMessage_Data))]
+    public void ToMessage_Should_ReturnHttpRequestMessage(
+        object input,
+        HttpMethod method,
+        string endpoint,
+        HttpRequestMessage expected
+    )
+    {
+        // Act
+        var actual = input.ToMessage(method, endpoint);
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    // ====================
+    // G Method (ToGuid)
+    // ====================
+
+    private class G_Should_ParseValidGuidStrings_Data : TheoryData<string, Guid>
+    {
+        public G_Should_ParseValidGuidStrings_Data()
+        {
+            Add(
+                "d2719a91-ea3e-4ec6-aec7-52f0c41cf09a",
+                Guid.Parse("d2719a91-ea3e-4ec6-aec7-52f0c41cf09a")
+            );
+            Add(
+                "3f4b3cd4-645f-48b0-b897-c96de3c021b2",
+                Guid.Parse("3f4b3cd4-645f-48b0-b897-c96de3c021b2")
+            );
+            Add(
+                "04e233b5-9c17-4514-89c2-c2b0c3e99829",
+                Guid.Parse("04e233b5-9c17-4514-89c2-c2b0c3e99829")
+            );
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(G_Should_ParseValidGuidStrings_Data))]
+    public void G_Should_ParseValidGuidStrings(string input, Guid expected)
+    {
+        // Act
+        var actual = input.G();
+
+        // Assert
+        actual
+            .Should()
+            .Be(expected, "G should correctly parse valid GUID strings into Guid objects");
+    }
+
+    // ==========================
+    // Invalid or Empty Strings
+    // ==========================
+
+    [Fact]
+    public void G_Should_ThrowFormatException_ForInvalidGuidStrings()
+    {
+        // Arrange
+        var input = "Invalid-Guid-String";
+
+        // Act
+        Action act = () => input.G();
+
+        // Assert
+        act.Should().Throw<FormatException>("Invalid GUID strings should cause a FormatException");
+    }
+
+    [Fact]
+    public void G_Should_ThrowFormatException_ForEmptyString()
+    {
+        // Arrange
+        var input = "";
+
+        // Act
+        Action act = () => input.G();
+
+        // Assert
+        act.Should()
+            .Throw<FormatException>(
+                "Empty strings are not valid GUIDs and should throw a FormatException"
+            );
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace CarboxylicBeryllium;
 
@@ -67,5 +68,64 @@ public static class Utility
     public static T ToObj<T>(this string json)
     {
         return JsonSerializer.Deserialize<T>(json)!;
+    }
+
+    /// <summary>
+    /// Encodes the specified plain text using Base64, defaults to UTF8 encoding
+    /// </summary>
+    /// <param name="plainText">The plain text.</param>
+    /// <param name="encoding"> The encoding format to use. Defaults to UTF8</param>
+    /// <returns></returns>
+    public static string Base64Encode(this string plainText, Encoding? encoding)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        var plainTextBytes = enc.GetBytes(plainText);
+        return Convert.ToBase64String(plainTextBytes);
+    }
+
+    /// <summary>
+    /// Decodes the specified base64 encoded string, defaults to UTF8 encoding
+    /// </summary>
+    /// <param name="base64EncodedData">The base64 encoded data.</param>
+    /// <param name="encoding">The encoding format to use. Defaults to UTF8</param>
+    /// <returns></returns>
+    public static string Base64Decode(this string base64EncodedData, Encoding? encoding)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+        return enc.GetString(base64EncodedBytes);
+    }
+
+    /// <summary>
+    /// Converts object to HTTP Message for HTTP Clients to use
+    /// </summary>
+    /// <param name="req">The object to be converted into HTTP Message</param>
+    /// <param name="method">HTTP Method (GET, POST, PUT, DELETE, ...)</param>
+    /// <param name="endpoint">Endpoint to send the URL to</param>
+    /// <returns></returns>
+    public static HttpRequestMessage ToMessage(this object req, HttpMethod method, string endpoint)
+    {
+        var content = req.ToStringRequest();
+        return new HttpRequestMessage(method, endpoint) { Content = content };
+    }
+
+    /// <summary>
+    /// Convert object to a StringContent
+    /// </summary>
+    /// <param name="req">The object to be converted into StringContent</param>
+    /// <returns>String content of JSON format of object</returns>
+    public static StringContent ToStringRequest(this object req)
+    {
+        return new StringContent(req.ToJson(), Encoding.UTF8, "application/json");
+    }
+
+    /// <summary>
+    /// Convert string to Guid
+    /// </summary>
+    /// <param name="s">string to be converted</param>
+    /// <returns>string in GUID</returns>
+    public static Guid G(this string s)
+    {
+        return Guid.Parse(s);
     }
 }
