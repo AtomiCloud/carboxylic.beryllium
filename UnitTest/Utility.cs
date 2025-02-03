@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 using CarboxylicBeryllium;
 using FluentAssertions;
 
@@ -532,5 +533,106 @@ public class UtilityTests
 
         // Assert
         act.Should().Throw<JsonException>();
+    }
+
+    // ============================================
+    //  Base64Encode method tests
+    // ============================================
+
+    // Data for Base64Encode method happy path
+    private class Base64Encode_Should_ReturnBase64String_Data
+        : TheoryData<string, Encoding?, string>
+    {
+        public Base64Encode_Should_ReturnBase64String_Data()
+        {
+            // Default encoding (UTF8)
+            Add("Hello, World!", null, "SGVsbG8sIFdvcmxkIQ=="); // Basic test
+            Add("12345", null, "MTIzNDU="); // Numeric string
+            Add("", null, ""); // Empty string
+            Add(" ", null, "IA=="); // Single space
+
+            // Custom encoding
+            Add("Hello, World!", Encoding.ASCII, "SGVsbG8sIFdvcmxkIQ=="); // ASCII
+            Add("世界", Encoding.UTF8, "5LiW55WM"); // UTF8 with non-ASCII chars
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(Base64Encode_Should_ReturnBase64String_Data))]
+    public void Base64Encode_Should_ReturnBase64String(
+        string input,
+        Encoding? encoding,
+        string expected
+    )
+    {
+        // Act
+        var result = input.Base64Encode(encoding);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Base64Encode_Should_ThrowArgumentNullException_For_NullInput()
+    {
+        // Arrange
+        string input = null!;
+
+        // Act
+        Action act = () => input.Base64Encode(Encoding.UTF8);
+
+        // Assert
+        act.Should()
+            .Throw<ArgumentNullException>()
+            .WithMessage("Value cannot be null. (Parameter 's')");
+    }
+
+    // ============================================
+    //    Base64Decode method tests
+    // ============================================
+
+    // Data for Base64Decode method happy path
+    private class Base64Decode_Should_ReturnPlainString_Data : TheoryData<string, Encoding?, string>
+    {
+        public Base64Decode_Should_ReturnPlainString_Data()
+        {
+            // Default encoding (UTF8)
+            Add("SGVsbG8sIFdvcmxkIQ==", null, "Hello, World!"); // Basic test
+            Add("MTIzNDU=", null, "12345"); // Numeric string
+            Add("", null, ""); // Empty string
+            Add("IA==", null, " "); // Single space
+
+            // Custom encoding
+            Add("SGVsbG8sIFdvcmxkIQ==", Encoding.ASCII, "Hello, World!"); // ASCII
+            Add("5Li76ZmG", Encoding.UTF8, "主陆"); // UTF8 with non-ASCII chars
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(Base64Decode_Should_ReturnPlainString_Data))]
+    public void Base64Decode_Should_ReturnPlainString(
+        string input,
+        Encoding? encoding,
+        string expected
+    )
+    {
+        // Act
+        var result = input.Base64Decode(encoding);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void Base64Decode_Should_ThrowFormatException_For_InvalidBase64String()
+    {
+        // Arrange
+        var invalidBase64 = "Invalid Base64 Data";
+
+        // Act
+        Action act = () => invalidBase64.Base64Decode(Encoding.UTF8);
+
+        // Assert
+        act.Should().Throw<FormatException>();
     }
 }

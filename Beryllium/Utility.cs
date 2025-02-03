@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace CarboxylicBeryllium;
 
@@ -67,5 +68,31 @@ public static class Utility
     public static T ToObj<T>(this string json)
     {
         return JsonSerializer.Deserialize<T>(json)!;
+    }
+
+    /// <summary>
+    /// Encodes the specified plain text using Base64, defaults to UTF8 encoding
+    /// </summary>
+    /// <param name="plainText">The plain text.</param>
+    /// <param name="encoding"> The encoding format to use. Defaults to UTF8</param>
+    /// <returns></returns>
+    public static string Base64Encode(this string plainText, Encoding? encoding)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        var plainTextBytes = enc.GetBytes(plainText);
+        return Convert.ToBase64String(plainTextBytes);
+    }
+
+    /// <summary>
+    /// Decodes the specified base64 encoded string, defaults to UTF8 encoding
+    /// </summary>
+    /// <param name="base64EncodedData">The base64 encoded data.</param>
+    /// <param name="encoding">The encoding format to use. Defaults to UTF8</param>
+    /// <returns></returns>
+    public static string Base64Decode(this string base64EncodedData, Encoding? encoding)
+    {
+        var enc = encoding ?? Encoding.UTF8;
+        var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+        return enc.GetString(base64EncodedBytes);
     }
 }
