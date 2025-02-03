@@ -159,11 +159,11 @@ types:
         desc: Dependency updates
         release: false
       patch:
-        desc: Dependency updates
+        desc: Dependency updates are patches
         release: patch
       minor:
-        desc: Dependency updates
+        desc: Dependency updates are minor
         release: minor
       major:
-        desc: Dependency updates
+        desc: Dependency updates are major
         release: major
