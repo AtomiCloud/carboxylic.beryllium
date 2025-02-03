@@ -95,4 +95,27 @@ public static class Utility
         var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
         return enc.GetString(base64EncodedBytes);
     }
+
+    /// <summary>
+    /// Converts object to HTTP Message for HTTP Clients to use
+    /// </summary>
+    /// <param name="req">The object to be converted into HTTP Message</param>
+    /// <param name="method">HTTP Method (GET, POST, PUT, DELETE, ...)</param>
+    /// <param name="endpoint">Endpoint to send the URL to</param>
+    /// <returns></returns>
+    public static HttpRequestMessage ToMessage(this object req, HttpMethod method, string endpoint)
+    {
+        var content = req.ToStringRequest();
+        return new HttpRequestMessage(method, endpoint) { Content = content };
+    }
+
+    /// <summary>
+    /// Convert object to a StringContent
+    /// </summary>
+    /// <param name="req">The object to be converted into StringContent</param>
+    /// <returns>String content of JSON format of object</returns>
+    public static StringContent ToStringRequest(this object req)
+    {
+        return new StringContent(req.ToJson(), Encoding.UTF8, "application/json");
+    }
 }

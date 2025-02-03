@@ -114,7 +114,7 @@ public class UtilityTests
             Add("23:59:59", new TimeOnly(23, 59, 59)); // End of day
             Add("00:00:00", new TimeOnly(0, 0, 0)); // Start of day
             Add("01:02:03", new TimeOnly(1, 2, 3)); // произвольное время
-            Add("12:34:56", new TimeOnly(12, 34, 56)); // Mid-day time
+            Add("12:34:56", new TimeOnly(12, 34, 56)); // Midday time
             Add("18:00:00", new TimeOnly(18, 0, 0)); // Evening time
         }
     }
@@ -634,5 +634,115 @@ public class UtilityTests
 
         // Assert
         act.Should().Throw<FormatException>();
+    }
+
+    private class MockRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public int Age { get; set; }
+    }
+
+    // ============================================
+    // 1) ToStringRequest method tests
+    // ============================================
+
+    // Data for ToStringRequest method happy path
+    private class ToStringRequest_Should_ReturnStringContent_Data
+        : TheoryData<object, StringContent>
+    {
+        public ToStringRequest_Should_ReturnStringContent_Data()
+        {
+            Add(
+                new MockRequest { Name = "John", Age = 30 },
+                new StringContent("""{"Name":"John","Age":30}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                new MockRequest { Name = string.Empty, Age = 0 },
+                new StringContent("""{"Name":"","Age":0}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                new { SomeProp = 123 },
+                new StringContent("""{"SomeProp":123}""", Encoding.UTF8, "application/json")
+            );
+            Add(
+                "Hello, World!",
+                new StringContent(
+                    """
+                    "Hello, World!"
+                    """,
+                    Encoding.UTF8,
+                    "application/json"
+                )
+            );
+            Add(12345, new StringContent("12345", Encoding.UTF8, "application/json"));
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ToStringRequest_Should_ReturnStringContent_Data))]
+    public void ToStringRequest_Should_ReturnStringContent(object input, StringContent expected)
+    {
+        // Act
+        var actual = input.ToStringRequest();
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    // ============================================
+    // 2) ToMessage method tests
+    // ============================================
+
+    // Data for ToMessage method happy path
+    private class ToMessage_Should_ReturnHttpRequestMessage_Data
+        : TheoryData<object, HttpMethod, string, HttpRequestMessage>
+    {
+        public ToMessage_Should_ReturnHttpRequestMessage_Data()
+        {
+            // Add(new MockRequest { Name = "Alice", Age = 25 }, HttpMethod.Post, "https://example.com/",
+            //     new HttpRequestMessage(HttpMethod.Post,"https://example.com/")
+            //     {
+            //         Content = new StringContent("""{"Name":"Alice","Age":25}""", Encoding.UTF8, "application/json")
+            //     });
+            Add(
+                new MockRequest { Name = "Bob", Age = 22 },
+                HttpMethod.Put,
+                "/api/users",
+                new HttpRequestMessage(HttpMethod.Put, "/api/users")
+                {
+                    Content = new StringContent(
+                        """{"Name":"Bob","Age":22}""",
+                        Encoding.UTF8,
+                        "application/json"
+                    ),
+                }
+            );
+
+            Add(
+                12345,
+                HttpMethod.Delete,
+                "https://example.com/delete",
+                new HttpRequestMessage(HttpMethod.Delete, "https://example.com/delete")
+                {
+                    Content = new StringContent("12345", Encoding.UTF8, "application/json"),
+                }
+            );
+        }
+    }
+
+    [Theory]
+    [ClassData(typeof(ToMessage_Should_ReturnHttpRequestMessage_Data))]
+    public void ToMessage_Should_ReturnHttpRequestMessage(
+        object input,
+        HttpMethod method,
+        string endpoint,
+        HttpRequestMessage expected
+    )
+    {
+        // Act
+        var actual = input.ToMessage(method, endpoint);
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
     }
 }
